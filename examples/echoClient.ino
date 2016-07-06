@@ -21,6 +21,6 @@ void setup() {
 
 void loop() {
 	// send heart beats every couple seconds
-	odieBotnetDevice.send( "Puh Puh...." );
+	odieBotnetDevice.send( "Pew Pew Pew....." );
 	delay( 2000 );
 }
