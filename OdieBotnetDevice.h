@@ -24,8 +24,9 @@ typedef struct OdieServerInfo {
 class OdieBotnetClient {
 public:
 	// Connect to OdieBotnet server instance on Local Network
+	//	0. Connect to wifi network
 	//	1. Broadcast UDP to find server
-	//	2. Recieve response from OdieBotnet Server
+	//	2. Recieve response with assigned ID from OdieBotnet Server
 	//	3. Connect webSocketClient to OdieBotnet server
 	bool connect();
 
