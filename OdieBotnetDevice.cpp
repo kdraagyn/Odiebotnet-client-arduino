@@ -11,6 +11,7 @@ OdieBotnetClient::OdieBotnetClient( char* ssid, char* password ) {
 
 	this.ssid = ssid;
 	this.password = password;
+	this.setWifiCreds = true;
 }
 
 OdieBotnetClient::~OdieBotnetClient() {
@@ -19,7 +20,15 @@ OdieBotnetClient::~OdieBotnetClient() {
 
 bool OdieBotnetClient::connect() {
 
-#ifdef DEBUGGING
+	if( !this->setWifiCreds ) {
+#if DEBUGGIN
+		Serial.println("OdieBotnet-Device must be created with wifi credentials");
+#endif
+		// hasn't set wifi creds
+		return false;
+	}
+
+#if DEBUGGING
 	Serial.print("Attempting to connect - ");
 	Serial.println(ssid);
 #endif
@@ -30,7 +39,7 @@ bool OdieBotnetClient::connect() {
 		return false;
 	}
 
-#ifdef DEBUGGING
+#if DEBUGGING
 	Serial.println( "Connected to network" );
 	Serial.println( "Attempting to find OdieBotnet server" );
 #endif
@@ -43,7 +52,7 @@ bool OdieBotnetClient::connect() {
 		return false;
 	}
 
-#ifdef DEBUGGING
+#if DEBUGGING
 	Serial.print( "Found Odie Server at - " );
 	Serial.print( odieServerinfo.address );
 	Serial.print( ":" );
@@ -69,13 +78,13 @@ bool OdieBotnetClient::connectWifiNetwork(char* ssid, char* password) {
 	while( Wifi.status() != WL_CONNECTED) ) {
 		delay( 500 );
 
-#ifdef DEBUGGING
+#if DEBUGGING
 		Serial.print('.');
 #endif
 
 		tries++;
 		if( tries > 30 ) {
-#ifdef DEBUGGING
+#if DEBUGGING
 			Serial.println();
 			Serial.println("Exceeded number of retries (30)");
 #endif
@@ -83,7 +92,7 @@ bool OdieBotnetClient::connectWifiNetwork(char* ssid, char* password) {
 			break;
 		}
 
-#ifdef DEBUGGING
+#if DEBUGGING
 		Serial.println();
 #endif
 	}
@@ -125,7 +134,7 @@ bool OdieBotnetClient::connectWebSocket( OdieServerInfo* odieInfo ) {
 	// Connect websocket with status response
 	if( !this.client.connect( odieServerAddressBuffer, odiePort) {
 
-#ifdef DEBUGGING
+#if DEBUGGING
 		Serial.println("Unable to connect to WebSocket");
 #endif
 		return false;
@@ -137,7 +146,7 @@ bool OdieBotnetClient::connectWebSocket( OdieServerInfo* odieInfo ) {
 	if( !this.webSocketClient.handshake( client ) ) {
 		// Unable to connect web socket
 
-#ifdef DEBUGGING
+#if DEBUGGING
 		Serial.println("Unable to complete handshake for WebSocket");
 #endif
 
@@ -159,7 +168,7 @@ bool OdieBotnetClient::broadcastInfo( IPAddress ipaddress ) {
 uint16_t OdieBotnetClient::getDeviceId( OdieServerInfo* serverInfo ) {
 	int reponseLength;
 
-#ifdef DEBUGGING
+#if DEBUGGING
 	Serial.print("Waiting for OdieResponse");
 #endif
 
@@ -167,32 +176,32 @@ uint16_t OdieBotnetClient::getDeviceId( OdieServerInfo* serverInfo ) {
 		responseLength = Udp.parsePacket();
 		delay( 100 );
 
-#ifdef DEBUGGING
+#if DEBUGGING
 		Serial.print('.');
 #endif
 	} while( responseLength < 1 );
 
-#ifdef DEBUGGING
+#if DEBUGGING
 	Serial.println( "Done" );
 #endif
 
 	char* responseBody = new char[responseLength];
-	Udp.read( responseBody, responseLength);
+	Udp.read( responseBody, responseLength );
 
 	StaticJsonBuffer<200> responseJsonBuffer;
 	JsonObject& responseRoot = responseJsonBuffer.parseObject( responseBody );
 
 	if( !responseRoot.success() ) {
-#ifdef DEBUGGING
-		Serial.println("Error parsing JSON response: ");
-		responseRoot.prettyPrintTo(Serial);
+#if DEBUGGING
+		Serial.println( "Error parsing JSON response: " );
+		responseRoot.prettyPrintTo( Serial );
 #endif
 
 		return -1;
 	}
 	
-	uint16_t id = responseRoot["id"];
-	serverInfo->port = responseRoot["port"];
+	uint16_t id = responseRoot[ "id" ];
+	serverInfo->port = responseRoot[ "port" ];
 	serverInfo->address = Udp.remoteIP();
 
 	return id;
@@ -200,7 +209,7 @@ uint16_t OdieBotnetClient::getDeviceId( OdieServerInfo* serverInfo ) {
 	
 
 IPAddress OdieBotnetClient::calculateBroadcastAddress() {
-	return ~Wifi.subnet_mask | wifi.gatewayIp();
+	return ~Wifi.subnet_mask() | wifi.gatewayIp();
 }
 
 void OdieBotnetClient::setId( uint16_t deviceId ) {

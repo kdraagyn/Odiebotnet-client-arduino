@@ -35,6 +35,9 @@ public:
 	void setCapabilities( char** );
 	char** getCapabilities();
 
+	// Create OdieBotnet object with the credentials to connect to wifi
+	// 	Only sets up OdieBotnetDevice to connect. Does not try to 
+	//	connect to an OdieBotnet server.
 	OdieBotnetClient( char*, char* );
 	~OdieBotnetClient();
 
@@ -59,6 +62,7 @@ private:
 	// Maintain state for connecting to wifi
 	char* ssid;
 	char* password;
+	bool setWifiCreds = false;
 
 	// Maintain state for communication through web socket
 	WebSocketClient webSocketClient;
