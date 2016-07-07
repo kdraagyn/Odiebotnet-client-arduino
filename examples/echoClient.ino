@@ -1,11 +1,9 @@
 #include "OdieBotnetDevice.h"
+#include "OdieBotnetEnvironment.h"
 
 // Used to give meaningful serial output
 //	Serial MUST be initialized before odieBotnet is connected or used
 #define DEBUGGING true
-
-const char* ssid = "OhDisWiFi";
-const char* password = "underwaterhorsesarecalledseahorses";
 
 OdieBotnetClient odieBotnetDevice( ssid, password );
 
