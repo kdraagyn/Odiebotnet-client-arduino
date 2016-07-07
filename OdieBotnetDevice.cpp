@@ -133,28 +133,11 @@ bool OdieBotnetClient::connectWebSocket( OdieServerInfo* odieInfo ) {
            odieAddress[3] );
 
   // Connect websocket with status response
-  if ( !this->wifiClient.connect( odieServerAddressBuffer, odiePort) ) {
+  this->webSocket.begin(odieServerAddressBuffer, odiePort);
+}
 
-    // #if DEBUGGING
-    Serial.println("Unable to connect to WebSocket");
-    // #endif
-    return false;
-  }
-
-  this->webSocketClient.path = "/";
-  this->webSocketClient.host = odieServerAddressBuffer;
-
-  if ( !this->webSocketClient.handshake( this->wifiClient ) ) {
-    // Unable to connect web socket
-
-    // #if DEBUGGING
-    Serial.println("Unable to complete handshake for WebSocket");
-    // #endif
-
-    return false;
-  }
-
-  return true;
+WebSocketsClient OdieBotnetClient::getSocket() {
+  return this->webSocket;
 }
 
 bool OdieBotnetClient::broadcastInfoUdp( IPAddress ipaddress ) {
@@ -201,9 +184,9 @@ uint16_t OdieBotnetClient::getDeviceId( OdieServerInfo* serverInfo ) {
   }
 
   uint16_t id = responseRoot[ "id" ];
-  this->deviceId = id;
   serverInfo->port = responseRoot[ "port" ];
   serverInfo->address = udp.remoteIP();
+  this->deviceId = id;
 
   return id;
 }
@@ -228,13 +211,3 @@ void OdieBotnetClient::setCapabilities( char** capabilities ) {
 char** OdieBotnetClient::getCapabilities() {
   return this->deviceCapabilities;
 }
-
-bool OdieBotnetClient::send(String str) {
-  if(this->wifiClient.connected()) {
-    this->webSocketClient.sendData(str);
-    return true;
-  }
-  this->connectedSocket = false;
-  return false;
-}
-
