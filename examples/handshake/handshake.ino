@@ -1,7 +1,5 @@
 #include "OdieBotnetDevice.h"
-
-#define WIFI_SSID "OdisWiFi"
-#define WIFI_PASSWORD "underwaterhorsesarecalledseahorses"
+#include "OdieBotnetEnvironment.h"
 
 #define DEBUGGING true
 
