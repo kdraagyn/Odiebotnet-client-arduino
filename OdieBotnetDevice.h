@@ -7,13 +7,16 @@
 #ifndef ODIEBOTNET_DEVICE_H_
 #define ODIEBOTNET_DEVICE_H_
 
-#include <WifiUDP.h>
+#include <WiFiUdp.h>
 #include <ESP8266WiFi.h>
+#include <ArduinoJson.h>
+#include <WebSocketClient.h>
 
 // TODO: pull udp broadcast port from config/eeprom
 #define _ODIE_UDP_BROADCAST_PORT 8080
+#define _DEVICE_UDP_LISTEN_PORT 9090
 
-#define _DEVICE_ID_KEY "deviceInfo"
+#define _DEVICE_ID_KEY "deviceId"
 #define _DEVICE_CAPABILITIES_KEY "deviceCapabilities"
 
 typedef struct OdieServerInfo {
@@ -29,6 +32,8 @@ public:
 	//	2. Recieve response with assigned ID from OdieBotnet Server
 	//	3. Connect webSocketClient to OdieBotnet server
 	bool connect();
+
+	bool send(String);
 
 	void setId( uint16_t );
 	uint16_t getId();
@@ -56,15 +61,24 @@ private:
 	// Calculate the correct broadcast address for broadcast UDP
 	IPAddress calculateBroadcastAddress();
 
-	// Model that holds the device's metadata
-	JsonObject* deviceInfo;
-
 	// Maintain state for connecting to wifi
 	char* ssid;
 	char* password;
 	bool setWifiCreds = false;
+	WiFiUDP udp;
+
+	uint16_t deviceId;
+	char** deviceCapabilities;
+
+	// Maintain state of connections
+	bool connectedWifi = false;
+	bool connectedUdp = false;
+	bool connectedSocket = false;
+	OdieServerInfo odieServerInfo;
 
 	// Maintain state for communication through web socket
 	WebSocketClient webSocketClient;
-	WifiClient wifiClient;
-}
+	WiFiClient wifiClient;
+};
+
+#endif
