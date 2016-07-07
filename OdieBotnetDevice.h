@@ -10,7 +10,7 @@
 #include <WiFiUdp.h>
 #include <ESP8266WiFi.h>
 #include <ArduinoJson.h>
-#include <WebSocketClient.h>
+#include <WebSocketsClient.h>
 
 // TODO: pull udp broadcast port from config/eeprom
 #define _ODIE_UDP_BROADCAST_PORT 8080
@@ -33,8 +33,6 @@ public:
 	//	3. Connect webSocketClient to OdieBotnet server
 	bool connect();
 
-	bool send(String);
-
 	void setId( uint16_t );
 	uint16_t getId();
 	void setCapabilities( char** );
@@ -46,6 +44,8 @@ public:
 	OdieBotnetClient( char*, char* );
 	~OdieBotnetClient();
 
+	// expose websocket client
+	WebSocketsClient getSocket();
 private:
 	// Connect ESP8266 to wifi network
 	bool connectWifiNetwork( char*, char* );
@@ -77,7 +77,7 @@ private:
 	OdieServerInfo odieServerInfo;
 
 	// Maintain state for communication through web socket
-	WebSocketClient webSocketClient;
+	WebSocketsClient webSocket;
 	WiFiClient wifiClient;
 };
 
