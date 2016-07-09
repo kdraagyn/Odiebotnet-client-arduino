@@ -23,6 +23,7 @@
 
 #define _EMPTY_DEVICE_ID 0
 #define _UDP_TIMEOUT 3000
+#define _WIFI_RETRIES 30
 
 typedef struct OdieServerInfo {
 	IPAddress address;
