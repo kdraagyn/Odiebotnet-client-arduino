@@ -65,13 +65,13 @@ bool OdieBotnetClient::connect() {
 
 bool OdieBotnetClient::connectWifiNetwork(char* ssid, char* password) {
   // check if wifi has already been setup
-  if(this->connectedWifi) {
+  if( this->connectedWifi ) {
     return this->connectedWifi;
   }
 
   int tries = 0;
 
-  WiFi.begin(ssid, password);
+  WiFi.begin( ssid, password );
   do {
     delay( 500 );
 
@@ -82,7 +82,7 @@ bool OdieBotnetClient::connectWifiNetwork(char* ssid, char* password) {
     tries++;
     if ( tries > _WIFI_RETRIES ) {
       this->connectedWifi = false;
-      this->errorMessages.push("Exceeded number of retries to connect to WiFi")
+      this->errorMessages.push("Exceeded number of retries to connect to WiFi");
       return this->connectedWifi;
     }
     this->connectedWifi = ( WiFi.status() == WL_CONNECTED );
@@ -112,7 +112,7 @@ bool OdieBotnetClient::findOdieServer( OdieServerInfo* odieServerInfo ) {
   Serial.println( broadcastAddress );
   
   if ( !broadcastInfoUdp( broadcastAddress ) ) {
-    this-errorMessages.push("Error occured in broadcasting UDP message to OdieBotnet server");
+    this->errorMessages.push("Error occured in broadcasting UDP message to OdieBotnet server");
     return false;
   }
 
