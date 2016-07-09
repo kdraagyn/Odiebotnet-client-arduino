@@ -11,6 +11,8 @@
 #include <ESP8266WiFi.h>
 #include <ArduinoJson.h>
 #include <WebSocketsClient.h>
+#include <QueueArray.h>
+#include <string.h>
 
 // TODO: pull udp broadcast port from config/eeprom
 #define _ODIE_UDP_BROADCAST_PORT 8080
@@ -18,6 +20,9 @@
 
 #define _DEVICE_ID_KEY "deviceId"
 #define _DEVICE_CAPABILITIES_KEY "deviceCapabilities"
+
+#define _EMPTY_DEVICE_ID 0
+#define _UDP_TIMEOUT 3000
 
 typedef struct OdieServerInfo {
 	IPAddress address;
@@ -37,6 +42,8 @@ public:
 	uint16_t getId();
 	void setCapabilities( char** );
 	char** getCapabilities();
+	char* getNextError();
+	bool hasMoreErrors();
 
 	// Create OdieBotnet object with the credentials to connect to wifi
 	// 	Only sets up OdieBotnetDevice to connect. Does not try to 
@@ -60,6 +67,9 @@ private:
 
 	// Calculate the correct broadcast address for broadcast UDP
 	IPAddress calculateBroadcastAddress();
+
+	// Errors during operation
+	QueueArray<char*> errorMessages;
 
 	// Maintain state for connecting to wifi
 	char* ssid;
