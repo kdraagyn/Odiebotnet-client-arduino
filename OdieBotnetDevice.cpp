@@ -25,8 +25,6 @@ bool OdieBotnetClient::connect() {
   }
 
   // #ifdef DEBUGGING
-  Serial.print("Attempting to connect - ");
-  Serial.println(ssid);
   // #endif
 
   // Connect to wifi network
@@ -69,6 +67,7 @@ bool OdieBotnetClient::connect() {
 bool OdieBotnetClient::connectWifiNetwork(char* ssid, char* password) {
   int tries = 0;
 
+  WiFi.begin(ssid, password);
   do {
     delay( 500 );
 
