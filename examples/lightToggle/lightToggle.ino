@@ -4,8 +4,8 @@
 #define DEBUGGING true
 
 #define LIGHT_ID_TAG_NAME "lightId"
-#define STATE_TAG_NAME "state"
-#define STATUS_TAG_NAME "status"
+#define STATE_TAG_NAME "turnOn"
+#define STATUS_TAG_NAME "isSuccessful"
 #define MESSAGE_TAG_NAME "message"
 
 #define LIGHT_COUNT 4
@@ -14,6 +14,8 @@ uint8_t lightIdToPin[] = { 0, 2, 4, 5 };
 // lightId 1 -> pin 2
 // lightId 2 -> pin 4
 // lightId 3 -> pin 5
+
+bool lightIdToState[] = {false, false, false, false};
 
 OdieBotnetClient odieBotnet( WIFI_SSID, WIFI_PASSWORD );
 WebSocketsClient socket;
@@ -54,13 +56,21 @@ char* generateToggleResponse( bool isSuccessful, char* message ) {
 	return responseBuffer;
 }
 
-bool setLight( int lightId, bool state ) {
+bool setLight( int lightId, bool state, char* message ) {
 	// TODO: may need some validation done to add security 
+	// check to make sure lightId is within the proper size
+	if( lightId >= LIGHT_COUNT ) {
+		message = "Unknown LightId";
+		return false;
+	}
+
 	uint8_t pin = lightIdToPin[ lightId ];
 	if( state ) { // turn light on
 		digitalWrite( pin, HIGH );
+		lightIdToState[ lightId ] = HIGH;
 	} else {
 		digitalWrite( pin, LOW );
+		lightIdToState[ lightId ] = LOW;
 	}
 	return true;
 }
@@ -84,8 +94,10 @@ void eventHandler(WStype_t type, uint8_t* payload, size_t length) {
 				isSuccessful = false;
 				message = "Unable to parse request";
 			} else {
-				isSuccessful = setLight( pinData.lightId, pinData.state );
-				message = "";
+				isSuccessful = setLight( pinData.lightId, pinData.state, message );
+				if( isSuccessful ) {
+					message = "";
+				}
 			}
 			
 			// generate and send response 
