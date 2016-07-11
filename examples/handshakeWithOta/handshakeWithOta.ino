@@ -31,6 +31,12 @@ void setup() {
 
 	while( !odieBotnet.connect() ) {
 		Serial.println("Unable to connect to OdieBotnet, Trying again..");
+	
+		while( odieBotnet.hasMoreErrors() ) {
+			Serial.print( "\t" );
+			Serial.println( odieBotnet.getNextError() );
+		}
+
 		delay( 200 );
 	}
 
@@ -70,12 +76,12 @@ void setup() {
 	});
 
 	server.on( "/setNetwork", HTTP_GET, []() {
+		// print out request json
+		int argsCount = server.args();
+		Serial.printf( "SSID: %s \nPASSWORD: %s \n", server.arg("ssid").c_str(), server.arg("password").c_str() );
 		server.sendHeader( "Connection", "close" );
 		server.sendHeader( "Access-Control-Allow-Origin", "*" );
 		server.send( 200, "application/json", "{\"status\":\"FAIL\", \"reason\":\"Unimplemented\"}" );
-	}, []() {
-		// print out request json
-		
 	});
 
 	server.begin();
