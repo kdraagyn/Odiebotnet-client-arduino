@@ -14,9 +14,13 @@ void eventHandler( WStype_t type, uint8_t* payload, size_t length ) {
 	// handle message
 	switch( type) {
 		case WStype_DISCONNECTED:
+			{
+				// update status LED to orange
+			}
 			break;
 		case WStype_CONNECTED:
 			{
+				// update status LED to green
 				Serial.println("Connected to web socket!");
 			}
 			break;

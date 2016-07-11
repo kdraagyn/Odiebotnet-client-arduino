@@ -2,4 +2,8 @@
 *.swp
 *.swo
 
+# ignore any header or cpp files in the examples director
+examples/*/*.cpp
+examples/*/*.h
+
 OdieBotnetEnvironment.h
