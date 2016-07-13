@@ -1,5 +1,5 @@
-#include "OdieBotnetDevice.h"
-#include "OdieBotnetEnvironment.h"
+#include "OdiebotnetClient.h"
+#include "OdiebotnetConfig.h"
 
 #define DEBUGGING true
 
@@ -18,7 +18,7 @@ uint8_t lightIdToPin[] = { 0, 2, 4, 5 };
 
 bool lightIdToState[] = {false, false, false, false};
 
-OdieBotnetClient odieBotnet( WIFI_SSID, WIFI_PASSWORD );
+OdiebotnetClient odieBotnet( WIFI_SSID, WIFI_PASSWORD );
 WebSocketsClient socket;
 
 // Queue for the responses that need to be sent back in the main loop rather than the eventHandler

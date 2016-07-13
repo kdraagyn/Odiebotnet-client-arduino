@@ -1,10 +1,10 @@
-#include "OdieBotnetDevice.h"
-#include "OdieBotnetEnvironment.h"
+#include "OdiebotnetClient.h"
+#include "OdiebotnetConfig.h"
 
 #define LOOP_COUNT_CUTOFF 100000
 #define TOGGLE_PIN 12
 
-OdieBotnetClient odieBotnet = OdieBotnetClient( WIFI_SSID, WIFI_PASSWORD );
+OdiebotnetClient odieBotnet = OdiebotnetClient( WIFI_SSID, WIFI_PASSWORD );
 WebSocketsClient socket;
 
 bool builtInLedState = false;

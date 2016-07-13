@@ -9,8 +9,9 @@
 #include <WiFiClient.h>
 #include <ESP8266mDNS.h>
 #include <ESP8266WebServer.h>
-#include "OdieBotnetDevice.h"
-#include "OdieBotnetEnvironment.h"
+
+#include "OdiebotnetClient.h"
+#include "OdiebotnetConfig.h"
 
 #define HOST_NAME "odieBotnet-device-1"
 #define HOST_PORT 80
@@ -24,7 +25,7 @@
 uint8_t lightIdToPin[] = { 5, 12 };
 bool lightIdToState[] = { false, false };
 
-OdieBotnetClient odieBotnet = OdieBotnetClient( WIFI_SSID, WIFI_PASSWORD );
+OdiebotnetClient odieBotnet = OdiebotnetClient( WIFI_SSID, WIFI_PASSWORD );
 WebSocketsClient socket;
 
 ESP8266WebServer server( HOST_PORT );

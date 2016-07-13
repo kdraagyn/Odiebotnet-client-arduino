@@ -1,9 +1,9 @@
-#include "OdieBotnetDevice.h"
-#include "OdieBotnetEnvironment.h"
+#include "OdiebotnetClient.h"
+#include "OdiebotnetConfig.h"
 
 #define DEBUGGING true
 
-OdieBotnetClient odieBotnet( WIFI_SSID, WIFI_PASSWORD );
+OdiebotnetClient odieBotnet( WIFI_SSID, WIFI_PASSWORD );
 WebSocketsClient socket;
 
 void eventHandler(WStype_t type, uint8_t* payload, size_t length) {
