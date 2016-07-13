@@ -1,20 +1,20 @@
 /*
  	July 5, 2016
-  	Implementation of OdieBotnetClient.h that is made to handle communication
+  	Implementation of OdiebotnetClient.h that is made to handle communication
  		and handle error handling with service discovery of the OdieBotnet server.
 */
-#include "OdieBotnetDevice.h"
+#include "OdiebotnetClient.h"
 
-OdieBotnetClient::OdieBotnetClient( char* ssid, char* password ) {
+OdiebotnetClient::OdiebotnetClient( char* ssid, char* password ) {
   this->ssid = ssid;
   this->password = password;
   this->setWifiCreds = true;
 }
 
-OdieBotnetClient::~OdieBotnetClient() {
+OdiebotnetClient::~OdiebotnetClient() {
 }
 
-bool OdieBotnetClient::connect() {
+bool OdiebotnetClient::connect() {
 
   if ( !this->setWifiCreds ) {
     // #ifdef DEBUGGING
@@ -33,7 +33,10 @@ bool OdieBotnetClient::connect() {
   }
 
   // #ifdef DEBUGGING
-  Serial.println( "Connected to network" );
+  Serial.print( "Connected to network (" );
+  Serial.print(WiFi.localIP());
+  Serial.println(")");
+
   Serial.println( "Attempting to find OdieBotnet server" );
   // #endif
 
@@ -63,7 +66,7 @@ bool OdieBotnetClient::connect() {
   return true;
 }
 
-bool OdieBotnetClient::connectWifiNetwork(char* ssid, char* password) {
+bool OdiebotnetClient::connectWifiNetwork(char* ssid, char* password) {
   // check if wifi has already been setup
   if( this->connectedWifi ) {
     return this->connectedWifi;
@@ -88,20 +91,14 @@ bool OdieBotnetClient::connectWifiNetwork(char* ssid, char* password) {
     this->connectedWifi = ( WiFi.status() == WL_CONNECTED );
   } while ( !this->connectedWifi ) ;
   
-  // #if DEBUGGING
   Serial.println();
-  Serial.print(WiFi.localIP());
-  Serial.print(":");
-  Serial.print(_DEVICE_UDP_LISTEN_PORT);
-  Serial.println();
-  // #endif
 
   this->udp.begin(_DEVICE_UDP_LISTEN_PORT);
 
   return this->connectedWifi;
 }
 
-bool OdieBotnetClient::findOdieServer( OdieServerInfo* odieServerInfo ) {
+bool OdiebotnetClient::findOdieServer( OdieServerInfo* odieServerInfo ) {
   if( this->connectedUdp ) {
     return true;
   }
@@ -121,7 +118,7 @@ bool OdieBotnetClient::findOdieServer( OdieServerInfo* odieServerInfo ) {
   return this->connectedUdp;
 }
 
-bool OdieBotnetClient::connectWebSocket( OdieServerInfo* odieInfo ) {
+bool OdiebotnetClient::connectWebSocket( OdieServerInfo* odieInfo ) {
   char odieServerAddressBuffer[16];
   IPAddress odieAddress = odieInfo->address;
   uint16_t odiePort = odieInfo->port;
@@ -137,11 +134,7 @@ bool OdieBotnetClient::connectWebSocket( OdieServerInfo* odieInfo ) {
   return true;
 }
 
-WebSocketsClient OdieBotnetClient::getSocket() {
-  return this->webSocket;
-}
-
-bool OdieBotnetClient::broadcastInfoUdp( IPAddress ipaddress ) {
+bool OdiebotnetClient::broadcastInfoUdp( IPAddress ipaddress ) {
   char deviceInfoBuffer[256];
   sprintf(deviceInfoBuffer, "{\"id\":\"%d\", \"capabilities\":[]}", this->deviceId );
 
@@ -150,14 +143,14 @@ bool OdieBotnetClient::broadcastInfoUdp( IPAddress ipaddress ) {
   this->udp.write( deviceInfoBuffer );
   this->udp.endPacket();
 
-  return false;
+  return true;
 }
 
-uint16_t OdieBotnetClient::getDeviceId( OdieServerInfo* serverInfo ) {
+uint16_t OdiebotnetClient::getDeviceId( OdieServerInfo* serverInfo ) {
   int responseLength;
 
   // #if DEBUGGING
-  Serial.print("Waiting for OdieResponse");
+  Serial.println("Waiting for OdieResponse");
   // #endif
 
   int tries = 0;
@@ -171,20 +164,15 @@ uint16_t OdieBotnetClient::getDeviceId( OdieServerInfo* serverInfo ) {
       return _EMPTY_DEVICE_ID;
     }
 
-    tries++;
-    delay(1);
+    if(responseLength < 1) {
+      delay(1);
+      tries++;
+    }
   } while ( responseLength < 1 );
-
-  // #if DEBUGGING
-  Serial.println( "Done" );
-  // #endif
 
   char* responseBody = new char[responseLength];
   udp.read( responseBody, responseLength );
 
-  Serial.println( responseLength );
-  Serial.println( responseBody );
-  
   StaticJsonBuffer<200> responseJsonBuffer;
   JsonObject& responseRoot = responseJsonBuffer.parseObject( responseBody );
 
@@ -202,34 +190,41 @@ uint16_t OdieBotnetClient::getDeviceId( OdieServerInfo* serverInfo ) {
   serverInfo->address = udp.remoteIP();
   this->deviceId = id;
 
+  Serial.print("Device id: ");
+  Serial.println( this->getId() );
+
   return id;
 }
 
 
-IPAddress OdieBotnetClient::calculateBroadcastAddress() {
+IPAddress OdiebotnetClient::calculateBroadcastAddress() {
   return ~WiFi.subnetMask() | WiFi.gatewayIP();
 }
 
-void OdieBotnetClient::setId( uint16_t deviceId ) {
+void OdiebotnetClient::setId( uint16_t deviceId ) {
   this->deviceId = deviceId;
 }
 
-uint16_t OdieBotnetClient::getId() {
+uint16_t OdiebotnetClient::getId() {
   return this->deviceId;
 }
 
-void OdieBotnetClient::setCapabilities( char** capabilities ) {
+void OdiebotnetClient::setCapabilities( char** capabilities ) {
   this->deviceCapabilities = capabilities;
 }
 
-char** OdieBotnetClient::getCapabilities() {
+char** OdiebotnetClient::getCapabilities() {
   return this->deviceCapabilities;
 }
 
-char* OdieBotnetClient::getNextError() {
+char* OdiebotnetClient::getNextError() {
 	return this->errorMessages.dequeue();
 }
 
-bool OdieBotnetClient::hasMoreErrors() {
+bool OdiebotnetClient::hasMoreErrors() {
 	return !this->errorMessages.isEmpty();
+}
+
+WebSocketsClient OdiebotnetClient::getSocket() {
+  return this->webSocket;
 }

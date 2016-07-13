@@ -6,4 +6,4 @@
 examples/*/*.cpp
 examples/*/*.h
 
-OdieBotnetEnvironment.h
+OdiebotnetConfig.h

@@ -1,11 +1,11 @@
-#include "OdieBotnetDevice.h"
-#include "OdieBotnetEnvironment.h"
+#include "OdiebotnetClient.h"
+#include "OdiebotnetConfig.h"
 
 // Used to give meaningful serial output
 //	Serial MUST be initialized before odieBotnet is connected or used
 #define DEBUGGING true
 
-OdieBotnetClient odieBotnetDevice( WIFI_SSID, WIFI_PASSWORD );
+OdiebotnetClient odieBotnetDevice( WIFI_SSID, WIFI_PASSWORD );
 WebSocketsClient socket;
 
 void eventHandler(WStype_t type, uint8_t* payload, size_t length) {
