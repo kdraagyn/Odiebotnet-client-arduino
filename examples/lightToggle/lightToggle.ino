@@ -9,6 +9,7 @@
 #define MESSAGE_TAG_NAME "message"
 
 #define LIGHT_COUNT 4
+
 uint8_t lightIdToPin[] = { 0, 2, 4, 5 };
 // lightId 0 -> pin 0
 // lightId 1 -> pin 2
@@ -22,6 +23,9 @@ WebSocketsClient socket;
 
 // Queue for the responses that need to be sent back in the main loop rather than the eventHandler
 QueueArray<char*> responseQueue;
+
+// keep track if webSocket connected state has changed
+bool webSocketConnected = false;
 
 typedef struct {
 	int lightId;
@@ -78,8 +82,14 @@ bool setLight( int lightId, bool state, char* message ) {
 void eventHandler(WStype_t type, uint8_t* payload, size_t length) {
 	switch(type) {
 		case WStype_DISCONNECTED:
+			if(webSocketConnected ) {
+				Serial.println( "Disconnected from OdieBotnet server.. :(" );
+				webSocketConnected = false;
+			}
 			break;
 		case WStype_CONNECTED:
+			Serial.println( "Connected to OdieBotnet server! :)" );
+			webSocketConnected = true;
 			break;
 		case WStype_TEXT:
 			Serial.println( (char*) payload );
