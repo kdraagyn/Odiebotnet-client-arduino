@@ -2,6 +2,8 @@
  *	July 5, 2016
  *	This library creates a Odiebotnet client that connects to the Odiebotnet 
  *		system.
+ *
+ *	Author: Keith Nygaard
  */
 
 #ifndef ODIEBOTNET_CLIENT_H_
