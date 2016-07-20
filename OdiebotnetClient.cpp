@@ -11,8 +11,7 @@ OdiebotnetClient::OdiebotnetClient( char* ssid, char* password ) {
   this->setWifiCreds = true;
 }
 
-OdiebotnetClient::~OdiebotnetClient() {
-}
+OdiebotnetClient::~OdiebotnetClient() { }
 
 bool OdiebotnetClient::connect() {
 
